@@ -2,6 +2,7 @@ package com.example.bean;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT;
 
 
@@ -20,6 +22,8 @@ class JacksonTest {
     static {
         objectMapper.setSerializationInclusion(NON_NULL);
         objectMapper.registerModule(new JavaTimeModule());
+//        objectMapper.configure(FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.disable(FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
     @Test
@@ -39,7 +43,7 @@ class JacksonTest {
 
     @Test
     void test2() throws JsonProcessingException {
-        String str = "{\"id\":1,\"age\":88, \"password\":\"123\",\"address\":\"London\",\"websiteUrl\":\"http://www.baidu.com\",\"registerDate\":\"2023-08-22 00:13:40\",\"birthday\":\"2023-08-22 00:13:40\"}";
+        String str = "{\"id\":1,\"age\": 88, \"password\":\"123\",\"address\":\"London\",\"websiteUrl\":\"http://www.baidu.com\",\"registerDate\":\"2023-08-22 00:13:40\",\"birthday\":\"2023-08-22 00:13:40\"}";
         User user = objectMapper.readValue(str, User.class);
         System.out.println(user);
     }

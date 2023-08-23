@@ -4,7 +4,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.Test;
@@ -26,6 +29,7 @@ class JacksonTest {
         objectMapper.registerModule(new JavaTimeModule());
 //        objectMapper.configure(FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.disable(FAIL_ON_UNKNOWN_PROPERTIES);
+        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
     }
 
     @Test
@@ -61,5 +65,24 @@ class JacksonTest {
 
         ResultVo<User> userResultVo = objectMapper.readValue(jsonStr, new TypeReference<ResultVo<User>>() {});
         User data = userResultVo.getData();
+    }
+
+    /**
+     * 对象更新：对象的合并/重写，如果后者的属性有值，则用后者，否则前者的值不变
+     * **/
+    @Test
+    void testUpdateObject() throws JsonMappingException {
+        User originalUser = new User();
+        originalUser.setId(1L);
+        originalUser.setName("Simon Roger");
+        originalUser.setWebsiteUrl("http://www.baidu.com");
+
+        User newUser = new User();
+        newUser.setId(2L);
+        newUser.setName("Alice Miller");
+
+        User updatedUser = objectMapper.updateValue(originalUser, newUser);
+        // id: 2 name: Alice Miller websiteUrl: http://www.baidu.com
+        System.out.println(updatedUser);
     }
 }
